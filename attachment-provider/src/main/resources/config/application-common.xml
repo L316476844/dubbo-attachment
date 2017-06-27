@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:task="http://www.springframework.org/schema/task" xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+                           http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.0.xsd
+                           http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd
+                           http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-4.0.xsd
+                           http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.0.xsd"
+    default-autowire="byName" default-lazy-init="false">
+
+    <context:annotation-config/>
+	<context:component-scan base-package="org.jon.lv.attachment" />
+
+	<bean
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="locations">
+			<list>
+				<value>classpath:dubbo.properties</value>
+				<value>classpath:oss-configure.properties</value>
+				<value>classpath:attachment-filter.properties</value>
+			</list>
+		</property>
+		<property name="searchSystemEnvironment" value="true" />
+		<property name="ignoreUnresolvablePlaceholders" value="false" />
+	</bean>
+
+
+	<bean id="dubboApplicationConfig" class="com.alibaba.dubbo.config.ApplicationConfig">
+		<property name="name" value="${app_name}"/>
+	</bean>
+
+	<bean id="dubboRegistryConfig" class="com.alibaba.dubbo.config.RegistryConfig">
+		<property name="default" value="true"/>
+		<property name="address" value="${registry.url}"/>
+		<property name="file" value="${registry.file}"/>
+	</bean>
+
+	<bean id="dubboProtocolConfig" class="com.alibaba.dubbo.config.ProtocolConfig">
+		<property name="port" value="${protocol.port}"/>
+		<property name="server" value="servlet"/>
+		<property name="contextpath" value="dubbo"/>
+		<property name="name" value="hessian"/>
+	</bean>
+
+	<!-- oss 配置 -->
+	<bean id="ossConfigure" class="org.jon.lv.attachment.oss.OssConfigure">
+		<property name="endpoint" value="${oss.endpoint}" />
+		<property name="accessId" value="${oss.accessId}" />
+		<property name="accessSecret" value="${oss.accessSecret}" />
+		<property name="bucketNameDefault" value="${oss.bucketName.default}" />
+		<property name="accessUrl" value="${oss.accessUrl}" />
+		<property name="imgFolder" value="${oss.default.img.folder}" />
+		<property name="fileFolder" value="${oss.default.file.folder}" />
+	</bean>
+
+	<bean class="org.jon.lv.attachment.oss.Initialization" autowire="byType">
+		<property name="ossConfigure" ref="ossConfigure"/>
+	</bean>
+
+	<bean id="attachmentFilter" class="org.jon.lv.attachment.oss.AttachmentFilter">
+		<property name="picFilters" value="${pic.suffixes}" />
+		<property name="fileFilters" value="${file.suffixes}" />
+		<property name="picLimit" value="${pic.limit}"/>
+		<property name="fileLimit" value="${file.limit}"/>
+	</bean>
+
+</beans>

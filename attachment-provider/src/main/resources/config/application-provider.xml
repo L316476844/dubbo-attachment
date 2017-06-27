@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd"
+       default-lazy-init="true">
+
+    <!--com.alibaba.dubbo.config.spring.ServiceBean-->
+    <bean id="serviceBean" class="org.jon.lv.utils.ServiceBean" abstract="true">
+        <property name="application" ref="dubboApplicationConfig"/>
+        <property name="registry" ref="dubboRegistryConfig"/>
+        <property name="protocol" ref="dubboProtocolConfig"/>
+        <property name="version" value="${provider.default_version}"/>
+        <property name="timeout" value="${provider.timeout}"/>
+        <property name="retries" value="0"/>
+    </bean>
+
+    <!-- AttachmentService -->
+    <bean id="attachmentService" parent="serviceBean">
+        <property name="protocol" value="hessian"/>
+        <property name="protocol.port" value="29080"/>
+        <property name="timeout" value="8000"/>
+        <property name="interface" value="org.jon.lv.attachment.service.AttachmentService"/>
+    </bean>
+
+</beans>
